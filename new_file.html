@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="{CHARSET}">
+		<title>数据交互测试</title>
+		<!--引入css-->
+		<link rel="stylesheet" href="css/new_file.css" />
+		<!--模板-->
+		<script type="text/template" id="app_tpl">
+			<div class="product">
+				<div class="imageContainer">
+				    <img src="{#img#}" />
+				    <div class="layer">
+					    <p>我最帅</p>
+					    <p>有点帅</p>
+				    </div>
+			    </div>
+			    <div class="content">
+			    	<p class="price">
+			    		<span class="price-text">￥{#price#}</span>
+			    		<span class="sum">{#sales#}人付款</span>
+			    	</p>
+			    	<p class="title">{#title#}</p>
+			    	<p class="store">
+			    		<span class="store-title">{#store#}</span>
+			    		<span class="adress">{#adress#}</span>
+			    	</p>
+			    </div>
+		    </div>
+		</script>
+	</head>
+	<body>
+		<div id="app"></div>
+		<script type="text/javascript">
+	//定义一个方法库
+		var Until={
+			//封装获取模板方法
+			id:function(id){
+				return document.getElementById(id);
+			},
+			//封装Ajax
+			ajax:function(url,callback){
+				var xhr=new XMLHttpRequest();
+				xhr.onreadystatechange=function(){
+					if(xhr.readyState===4){
+						if(xhr.status===200){
+							var data=JSON.parse(xhr.responseText);
+							callback && callback(data);
+						}
+					}
+				}
+				xhr.open("get",url,true);
+				xhr.send(null);
+			}
+		}
+        function formdataString(str,data){
+        	return str.replace(/\{#(\w+)#\}/g,function(match,$1){
+                return data[$1]=== undefined?'':data[$1]
+        	});
+        }
+		var tpl=Until.id("app_tpl").innerHTML;
+		var html='';
+		Until.ajax("data/list.json",function(data){
+            var data=data.list;
+            for(var i=0;i<data.length;i++){
+            	html += formdataString(tpl,data[i]);
+            }
+        Until.id("app").innerHTML=html;
+		});
+	</script>
+	</body>
+</html>
